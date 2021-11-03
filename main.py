@@ -3,9 +3,11 @@
 
 import sys
 
+from uml_garden import UmlGarden
+
 
 def main(argvs: list[str]) -> None:
-    pass
+    UmlGarden(argvs)
 
 
 if __name__ == "__main__":
