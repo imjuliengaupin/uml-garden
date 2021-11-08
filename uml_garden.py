@@ -13,3 +13,4 @@ class UmlGarden(object):
     def run_uml_garden(self, argvs: list[str]) -> None:
         argvs.pop(0) if len(argvs) >= MIN_ARGS_REQUIRED else sys.exit(f"insufficient number of argvs provided")
         gardener: UmlGenerator = UmlGenerator(argvs)
+        gardener.generate_plantuml_class_figure()
