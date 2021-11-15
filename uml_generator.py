@@ -10,6 +10,9 @@ class UmlGenerator(object):
 
     def __init__(self, py_files: list[str]) -> None:
         self.py_files: list[str] = py_files
+        self.classes: list = []
+        self.class_relationships: dict = {}
+        self.parents: dict = {}
 
     def get_package_name(self, index: int) -> str:
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -39,7 +42,7 @@ class UmlGenerator(object):
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
-            # write out the conventional uml file footer to th new .puml file created
+            # write out the conventional uml file footer to the new .puml file created
             plantuml_file.write(f"{UML_CLOSE}\n")
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
