@@ -19,8 +19,6 @@ class UmlGenerator(object):
         return os.path.basename(self.py_files[index].split('.')[0])
 
     def generate_plantuml_class_figure(self) -> None:
-        "generate_plantuml_class_figure()"
-        
         # by default, create a folder in the project directory to store the output .puml file
         if not os.path.exists(PLANTUMLS):
             os.makedirs(PLANTUMLS)
