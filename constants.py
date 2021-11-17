@@ -1,4 +1,5 @@
 
+# paths
 PLANTUMLS: str = "./plantuml"
 
 # uml_garden.py
