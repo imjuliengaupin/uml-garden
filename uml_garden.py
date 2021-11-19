@@ -8,6 +8,8 @@ from uml_generator import UmlGenerator
 class UmlGarden(object):
 
     def __init__(self, argvs: list[str]) -> None:
+        if DEBUG_MODE:
+            LOGGER.debug(f"{self.run_uml_garden.__doc__}".replace("()", f"(argvs={argvs})"))
         self.run_uml_garden(argvs)
 
     def run_uml_garden(self, argvs: list[str]) -> None:
