@@ -3,7 +3,7 @@ import io
 import os
 import sys
 
-from constants import PLANTUMLS, UML_OPEN, UML_CLOSE
+from constants import DEBUG_MODE, LOGGER, PLANTUMLS, UML_OPEN, UML_CLOSE
 
 
 class UmlGenerator(object):
@@ -15,6 +15,7 @@ class UmlGenerator(object):
         self.parents: dict = {}
 
     def get_package_name(self, index: int) -> str:
+        "get_package_name()"
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         return os.path.basename(self.py_files[index].split('.')[0])
 
@@ -41,6 +42,9 @@ class UmlGenerator(object):
                 # ... capture the arguments index position in the argvs list
                 index: int = self.py_files.index(py_file)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.write_pre_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", index={str(index)})"))
+
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
@@ -48,6 +52,11 @@ class UmlGenerator(object):
             plantuml_file.write(f"{UML_CLOSE}\n")
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
+        "write_pre_uml_content()"
+
+        if DEBUG_MODE:
+            LOGGER.debug(f"{self.get_package_name.__doc__}".replace("()", f"(index={str(index)})"))
+        
         # extract the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         package_name: str = self.get_package_name(index)
 
