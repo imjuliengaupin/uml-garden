@@ -43,6 +43,9 @@ class UmlGenerator(object):
                 self.write_pre_uml_content(plantuml_file, index)
 
                 # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
+                self.write_core_uml_content(plantuml_file, py_file)
+
+                # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
                 self.write_post_uml_content(plantuml_file)
 
             # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
@@ -60,6 +63,11 @@ class UmlGenerator(object):
 
         # write out the .py package name to the new .puml file created
         plantuml_file.write(f"package {package_name} {{\n")
+
+    def write_core_uml_content(self, plantuml_file: io.TextIOWrapper, py_file: str) -> None:
+
+        for line_of_code in open(py_file, 'r'):
+            pass
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
