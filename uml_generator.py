@@ -42,6 +42,15 @@ class UmlGenerator(object):
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
+                # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
+                self.write_core_uml_content(plantuml_file, py_file)
+
+                # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
+                self.write_post_uml_content(plantuml_file)
+
+            # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
+            self.write_post_uml_relationship_content(plantuml_file)
+
             # write out the conventional uml file footer to the new .puml file created
             plantuml_file.write(f"{UML_CLOSE}\n")
 
@@ -54,3 +63,28 @@ class UmlGenerator(object):
 
         # write out the .py package name to the new .puml file created
         plantuml_file.write(f"package {package_name} {{\n")
+
+    def write_core_uml_content(self, plantuml_file: io.TextIOWrapper, py_file: str) -> None:
+
+        for line_of_code in open(py_file, 'r'):
+            pass
+
+    def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
+
+        for class_name, class_members in self.class_variables.items():
+            for class_member in class_members:
+                plantuml_file.write(f"{class_name} : {class_member}\n")
+
+        plantuml_file.write("}\n\n")
+
+    def write_post_uml_relationship_content(self, plantuml_file: io.TextIOWrapper) -> None:
+
+        for child_class, parent_class in self.parents.items():
+            if not parent_class or parent_class == "object":
+                continue
+            plantuml_file.write(f"{parent_class} <|-- {child_class}\n")
+
+        for related_class, classes in self.class_relationships.items():
+            for instantiated_class in classes:
+                if instantiated_class in self.classes and related_class != instantiated_class:
+                    plantuml_file.write(f"{related_class} -- {instantiated_class}\n")
