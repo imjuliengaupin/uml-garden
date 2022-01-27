@@ -1,6 +1,7 @@
 
 import io
 import os
+import re as regex
 import sys
 
 from constants import PLANTUMLS, UML_OPEN, UML_CLOSE
@@ -13,6 +14,9 @@ class UmlGenerator(object):
         self.classes: list = []
         self.class_relationships: dict = {}
         self.parents: dict = {}
+
+        self.is_newline_found: regex.Pattern = regex.compile(r"^\s*(:?$|#|raise|print)")
+        self.is_base_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\)\s*:")
 
     def get_package_name(self, index: int) -> str:
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -53,6 +57,9 @@ class UmlGenerator(object):
 
             # write out the conventional uml file footer to the new .puml file created
             plantuml_file.write(f"{UML_CLOSE}\n")
+    
+    def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
+        pass
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
         # extract the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -67,7 +74,18 @@ class UmlGenerator(object):
     def write_core_uml_content(self, plantuml_file: io.TextIOWrapper, py_file: str) -> None:
 
         for line_of_code in open(py_file, 'r'):
-            pass
+            # if a newline "\n" is found in the code file being read, ignore it
+            if self.is_newline_found.match(line_of_code):
+                continue
+
+            base_class_found = self.is_base_class_found.match(line_of_code)
+
+            if base_class_found:
+                base_class_name = base_class_found.group(1)
+
+                self.set_class_name_uml_notation(plantuml_file, base_class_name, "")
+
+                continue
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
