@@ -17,6 +17,7 @@ class UmlGenerator(object):
 
         self.is_newline_found: regex.Pattern = regex.compile(r"^\s*(:?$|#|raise|print)")
         self.is_base_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\)\s*:")
+        self.is_child_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\s*([\w\d\._]+)\s*\):")
 
     def get_package_name(self, index: int) -> str:
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -57,7 +58,7 @@ class UmlGenerator(object):
 
             # write out the conventional uml file footer to the new .puml file created
             plantuml_file.write(f"{UML_CLOSE}\n")
-    
+
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
         pass
 
@@ -84,6 +85,18 @@ class UmlGenerator(object):
                 base_class_name = base_class_found.group(1)
 
                 self.set_class_name_uml_notation(plantuml_file, base_class_name, "")
+
+                continue
+
+            # if a class that has a parent is found
+            child_class_found = self.is_child_class_found.match(line_of_code)
+
+            if child_class_found:
+                # NOTE https://docs.python.org/3/library/re.html#re.Match.group
+                child_class_name = child_class_found.group(1)
+                parent_class_name = child_class_found.group(2)
+
+                self.set_class_name_uml_notation(plantuml_file, child_class_name, parent_class_name)
 
                 continue
 
