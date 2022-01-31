@@ -25,6 +25,8 @@ class UmlGenerator(object):
         return os.path.basename(self.py_files[index].split('.')[0])
 
     def generate_plantuml_class_figure(self) -> None:
+        "generate_plantuml_class_figure()"
+        
         # by default, create a folder in the project directory to store the output .puml file
         if not os.path.exists(PLANTUMLS):
             os.makedirs(PLANTUMLS)
@@ -64,6 +66,7 @@ class UmlGenerator(object):
             plantuml_file.write(f"{UML_CLOSE}\n")
 
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
+        "set_class_name_uml_notation()"
         pass
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
@@ -82,6 +85,7 @@ class UmlGenerator(object):
         plantuml_file.write(f"package {package_name} {{\n")
 
     def write_core_uml_content(self, plantuml_file: io.TextIOWrapper, py_file: str) -> None:
+        "write_core_uml_content()"
 
         for line_of_code in open(py_file, 'r'):
             # if a newline "\n" is found in the code file being read, ignore it
@@ -110,6 +114,7 @@ class UmlGenerator(object):
                 continue
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
+        "write_post_uml_content()"
 
         for class_name, class_members in self.class_variables.items():
             for class_member in class_members:
@@ -118,6 +123,7 @@ class UmlGenerator(object):
         plantuml_file.write("}\n\n")
 
     def write_post_uml_relationship_content(self, plantuml_file: io.TextIOWrapper) -> None:
+        "write_post_uml_relationship_content()"
 
         for child_class, parent_class in self.parents.items():
             if not parent_class or parent_class == "object":
