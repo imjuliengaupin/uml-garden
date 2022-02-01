@@ -53,11 +53,20 @@ class UmlGenerator(object):
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.write_core_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
+
                 # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
                 self.write_core_uml_content(plantuml_file, py_file)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.write_post_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
+
                 # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
                 self.write_post_uml_content(plantuml_file)
+
+            if DEBUG_MODE:
+                LOGGER.debug(f"{self.write_post_uml_relationship_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
 
             # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
             self.write_post_uml_relationship_content(plantuml_file)
