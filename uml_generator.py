@@ -26,7 +26,7 @@ class UmlGenerator(object):
 
     def generate_plantuml_class_figure(self) -> None:
         "generate_plantuml_class_figure()"
-        
+
         # by default, create a folder in the project directory to store the output .puml file
         if not os.path.exists(PLANTUMLS):
             os.makedirs(PLANTUMLS)
@@ -83,7 +83,7 @@ class UmlGenerator(object):
 
         if DEBUG_MODE:
             LOGGER.debug(f"{self.get_package_name.__doc__}".replace("()", f"(index={str(index)})"))
-        
+
         # extract the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         package_name: str = self.get_package_name(index)
 
@@ -120,6 +120,9 @@ class UmlGenerator(object):
                 # NOTE https://docs.python.org/3/library/re.html#re.Match.group
                 child_class_name = child_class_found.group(1)
                 parent_class_name = child_class_found.group(2)
+
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.set_class_name_uml_notation.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", base_or_child_class_name=\"{child_class_name}\", parent_class_name=\"{parent_class_name}\")"))
 
                 self.set_class_name_uml_notation(plantuml_file, child_class_name, parent_class_name)
 
