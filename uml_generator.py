@@ -106,6 +106,9 @@ class UmlGenerator(object):
             if base_class_found:
                 base_class_name = base_class_found.group(1)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.set_class_name_uml_notation.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", base_or_child_class_name=\"{base_class_name}\", parent_class_name=\"\")"))
+
                 self.set_class_name_uml_notation(plantuml_file, base_class_name, "")
 
                 continue
