@@ -57,6 +57,9 @@ class UmlGenerator(object):
             # write out the conventional uml file footer to the new .puml file created
             plantuml_file.write(f"{UML_CLOSE}\n")
 
+    def set_class_variable_uml_notation(self, class_variable_name: str) -> None:
+        pass
+
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
         pass
 
@@ -103,6 +106,8 @@ class UmlGenerator(object):
 
             if class_variable_found and self.class_name:
                 class_variable_name = class_variable_found.group(1)
+            
+                self.set_class_variable_uml_notation(class_variable_name)
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
