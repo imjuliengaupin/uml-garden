@@ -18,6 +18,7 @@ class UmlGenerator(object):
         self.is_newline_found: regex.Pattern = regex.compile(r"^\s*(:?$|#|raise|print)")
         self.is_base_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\)\s*:")
         self.is_child_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\s*([\w\d\._]+)\s*\):")
+        self.is_class_variable_found: regex.Pattern = regex.compile(r"^\s+self.([_\w]+)\s*=")
 
     def get_package_name(self, index: int) -> str:
         "get_package_name()"
@@ -127,6 +128,12 @@ class UmlGenerator(object):
                 self.set_class_name_uml_notation(plantuml_file, child_class_name, parent_class_name)
 
                 continue
+
+            # if a class variable is found
+            class_variable_found = self.is_class_variable_found.match(line_of_code)
+
+            if class_variable_found and self.class_name:
+                class_variable_name = class_variable_found.group(1)
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
         "write_post_uml_content()"
