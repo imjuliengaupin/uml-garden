@@ -19,6 +19,7 @@ class UmlGenerator(object):
         self.is_base_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\)\s*:")
         self.is_child_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\s*([\w\d\._]+)\s*\):")
         self.is_class_variable_found: regex.Pattern = regex.compile(r"^\s+self.([_\w]+)\s*=")
+        self.is_private_class_variable_found: regex.Pattern = regex.compile(r"^__[\w\d_]+")
 
     def get_package_name(self, index: int) -> str:
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -58,7 +59,11 @@ class UmlGenerator(object):
             plantuml_file.write(f"{UML_CLOSE}\n")
 
     def get_class_variable_uml_notation(self, class_variable_name: str) -> str:
-        ...
+        # for private class variables, e.g. self.__var
+        if self.is_private_class_variable_found.match(class_variable_name):
+            return '-' + class_variable_name
+        else:
+            return '+' + class_variable_name
 
     def set_class_variable_uml_notation(self, class_variable_name: str) -> None:
         class_variable = self.get_class_variable_uml_notation(class_variable_name)
