@@ -20,6 +20,7 @@ class UmlGenerator(object):
         self.is_child_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\s*([\w\d\._]+)\s*\):")
         self.is_class_variable_found: regex.Pattern = regex.compile(r"^\s+self.([_\w]+)\s*=")
         self.is_private_class_variable_found: regex.Pattern = regex.compile(r"^__[\w\d_]+")
+        self.is_protected_class_variable_found: regex.Pattern = regex.compile(r"^_[\w\d_]+")
 
     def get_package_name(self, index: int) -> str:
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -62,6 +63,9 @@ class UmlGenerator(object):
         # for private class variables, e.g. self.__var
         if self.is_private_class_variable_found.match(class_variable_name):
             return '-' + class_variable_name
+        elif self.is_protected_class_variable_found.match(class_variable_name):
+            return '#' + class_variable_name
+        # for public class variables, e.g. self.var
         else:
             return '+' + class_variable_name
 
