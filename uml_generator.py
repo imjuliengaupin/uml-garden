@@ -71,13 +71,16 @@ class UmlGenerator(object):
         else:
             return '+' + class_variable_name
 
+    def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
+        pass
+
     def set_class_variable_uml_notation(self, class_variable_name: str) -> None:
         class_variable = self.get_class_variable_uml_notation(class_variable_name)
 
         if class_variable not in self.class_variables[self.class_name]:
             self.class_variables[self.class_name].append(class_variable)
 
-    def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
+    def set_class_method_uml_notation(self, plantuml_file: io.TextIOWrapper, class_method_name: str) -> None:
         pass
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
@@ -128,6 +131,13 @@ class UmlGenerator(object):
             
             # if a class method is found
             class_method_found = self.is_class_method_found.match(line_of_code)
+
+            if class_method_found and self.class_name:
+                class_method_name = class_method_found.group(1)
+
+                self.set_class_method_uml_notation(plantuml_file, class_method_name)
+
+                continue
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
