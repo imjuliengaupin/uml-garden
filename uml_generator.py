@@ -21,6 +21,7 @@ class UmlGenerator(object):
         self.is_class_variable_found: regex.Pattern = regex.compile(r"^\s+self.([_\w]+)\s*=")
         self.is_private_class_variable_found: regex.Pattern = regex.compile(r"^__[\w\d_]+")
         self.is_protected_class_variable_found: regex.Pattern = regex.compile(r"^_[\w\d_]+")
+        self.is_class_method_found: regex.Pattern = regex.compile(r"^\s+def (\w+)\(.*\):")
 
     def get_package_name(self, index: int) -> str:
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -63,6 +64,7 @@ class UmlGenerator(object):
         # for private class variables, e.g. self.__var
         if self.is_private_class_variable_found.match(class_variable_name):
             return '-' + class_variable_name
+        # for protected class variables, e.g. self._var
         elif self.is_protected_class_variable_found.match(class_variable_name):
             return '#' + class_variable_name
         # for public class variables, e.g. self.var
@@ -123,6 +125,9 @@ class UmlGenerator(object):
                 class_variable_name = class_variable_found.group(1)
             
                 self.set_class_variable_uml_notation(class_variable_name)
+            
+            # if a class method is found
+            class_method_found = self.is_class_method_found.match(line_of_code)
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
