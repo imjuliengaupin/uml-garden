@@ -61,6 +61,7 @@ class UmlGenerator(object):
             plantuml_file.write(f"{UML_CLOSE}\n")
 
     def get_class_variable_uml_notation(self, class_variable_name: str) -> str:
+
         # for private class variables, e.g. self.__var
         if self.is_private_class_variable_found.match(class_variable_name):
             return '-' + class_variable_name
@@ -72,7 +73,17 @@ class UmlGenerator(object):
             return '+' + class_variable_name
 
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
-        pass
+        if base_or_child_class_name in self.classes:
+            return
+
+        self.classes.append(base_or_child_class_name)
+
+        self.class_relationships[base_or_child_class_name] = []
+        self.parents[base_or_child_class_name] = parent_class_name
+        self.class_name = base_or_child_class_name  # no type hinting recommended
+        self.class_variables[base_or_child_class_name] = []
+
+        plantuml_file.write(f"class {base_or_child_class_name}\n")
 
     def set_class_variable_uml_notation(self, class_variable_name: str) -> None:
         class_variable = self.get_class_variable_uml_notation(class_variable_name)
@@ -128,7 +139,9 @@ class UmlGenerator(object):
                 class_variable_name = class_variable_found.group(1)
             
                 self.set_class_variable_uml_notation(class_variable_name)
-            
+
+                # TEST add a continue statement here ?
+
             # if a class method is found
             class_method_found = self.is_class_method_found.match(line_of_code)
 
