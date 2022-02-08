@@ -24,10 +24,12 @@ class UmlGenerator(object):
         self.is_class_method_found: regex.Pattern = regex.compile(r"^\s+def (\w+)\(.*\):")
 
     def get_package_name(self, index: int) -> str:
+
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         return os.path.basename(self.py_files[index].split('.')[0])
 
     def generate_plantuml_class_figure(self) -> None:
+
         # by default, create a folder in the project directory to store the output .puml file
         if not os.path.exists(PLANTUMLS):
             os.makedirs(PLANTUMLS)
@@ -72,7 +74,11 @@ class UmlGenerator(object):
         else:
             return '+' + class_variable_name
 
+    def get_class_method_uml_notation(self, class_method_name: str) -> str:
+        ...
+
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
+
         if base_or_child_class_name in self.classes:
             return
 
@@ -86,15 +92,20 @@ class UmlGenerator(object):
         plantuml_file.write(f"class {base_or_child_class_name}\n")
 
     def set_class_variable_uml_notation(self, class_variable_name: str) -> None:
+
         class_variable = self.get_class_variable_uml_notation(class_variable_name)
 
         if class_variable not in self.class_variables[self.class_name]:
             self.class_variables[self.class_name].append(class_variable)
 
     def set_class_method_uml_notation(self, plantuml_file: io.TextIOWrapper, class_method_name: str) -> None:
-        pass
+
+        class_method_name = self.get_class_method_uml_notation(class_method_name)
+
+        plantuml_file.write(f"{self.class_name} : {class_method_name}()\n")
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
+
         # extract the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         package_name: str = self.get_package_name(index)
 
