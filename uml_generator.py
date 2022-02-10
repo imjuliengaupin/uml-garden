@@ -51,6 +51,9 @@ class UmlGenerator(object):
                 # ... capture the arguments index position in the argvs list
                 index: int = self.py_files.index(py_file)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.write_pre_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", index={str(index)})"))
+
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
