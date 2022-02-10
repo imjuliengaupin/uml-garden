@@ -23,6 +23,7 @@ class UmlGenerator(object):
         self.is_protected_class_variable_found: regex.Pattern = regex.compile(r"^_[\w\d_]+")
         self.is_class_method_found: regex.Pattern = regex.compile(r"^\s+def (\w+)\(.*\):")
         self.is_builtin_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+__")
+        self.is_private_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+")
 
     def get_package_name(self, index: int) -> str:
 
@@ -50,9 +51,6 @@ class UmlGenerator(object):
 
                 # ... capture the arguments index position in the argvs list
                 index: int = self.py_files.index(py_file)
-
-                if DEBUG_MODE:
-                    LOGGER.debug(f"{self.write_pre_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", index={str(index)})"))
 
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
@@ -83,6 +81,9 @@ class UmlGenerator(object):
         # for built-in class methods, e.g. __init__(), __str__(), etc.
         if self.is_builtin_class_method_found.match(class_method_name):
             return '+' + class_method_name
+        # for private class methods, e.g. __method()
+        elif self.is_private_class_method_found.match(class_method_name):
+            return '-' + class_method_name
         # for public class methods, e.g. method()
         else:
             return '+' + class_method_name
