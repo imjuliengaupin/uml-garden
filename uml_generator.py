@@ -24,6 +24,7 @@ class UmlGenerator(object):
         self.is_class_method_found: regex.Pattern = regex.compile(r"^\s+def (\w+)\(.*\):")
         self.is_builtin_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+__")
         self.is_private_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+")
+        self.is_protected_class_method_found: regex.Pattern = regex.compile(r"^_[\w_]+")
 
     def get_package_name(self, index: int) -> str:
 
@@ -84,6 +85,9 @@ class UmlGenerator(object):
         # for private class methods, e.g. __method()
         elif self.is_private_class_method_found.match(class_method_name):
             return '-' + class_method_name
+        # for protected class methods, e.g. _method()
+        elif self.is_protected_class_method_found.match(class_method_name):
+            return '#' + class_method_name
         # for public class methods, e.g. method()
         else:
             return '+' + class_method_name
