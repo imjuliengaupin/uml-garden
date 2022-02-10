@@ -22,6 +22,7 @@ class UmlGenerator(object):
         self.is_private_class_variable_found: regex.Pattern = regex.compile(r"^__[\w\d_]+")
         self.is_protected_class_variable_found: regex.Pattern = regex.compile(r"^_[\w\d_]+")
         self.is_class_method_found: regex.Pattern = regex.compile(r"^\s+def (\w+)\(.*\):")
+        self.is_builtin_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+__")
 
     def get_package_name(self, index: int) -> str:
 
@@ -75,7 +76,13 @@ class UmlGenerator(object):
             return '+' + class_variable_name
 
     def get_class_method_uml_notation(self, class_method_name: str) -> str:
-        ...
+
+        # for built-in class methods, e.g. __init__(), __str__(), etc.
+        if self.is_builtin_class_method_found.match(class_method_name):
+            return '+' + class_method_name
+        # for public class methods, e.g. method()
+        else:
+            return '+' + class_method_name
 
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
 
