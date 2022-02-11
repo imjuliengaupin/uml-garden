@@ -121,7 +121,9 @@ class UmlGenerator(object):
         plantuml_file.write(f"{self.class_name} : {class_method_name}()\n")
 
     def set_class_instantiation_uml_relationships(self, instantiated_class_name: str) -> None:
-        pass
+        
+        if instantiated_class_name not in self.class_relationships[self.class_name]:
+            self.class_relationships[self.class_name].append(instantiated_class_name)
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
 
