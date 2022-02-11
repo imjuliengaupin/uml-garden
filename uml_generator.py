@@ -25,6 +25,7 @@ class UmlGenerator(object):
         self.is_builtin_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+__")
         self.is_private_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+")
         self.is_protected_class_method_found: regex.Pattern = regex.compile(r"^_[\w_]+")
+        self.is_instantiated_class_found: regex.Pattern = regex.compile(r"((:?[A-Z]+[a-z0-9]+)+)\(.*\)")
 
     def get_package_name(self, index: int) -> str:
 
@@ -178,6 +179,10 @@ class UmlGenerator(object):
 
                 continue
 
+            # if any class instantiation is found
+            # NOTE https://docs.python.org/3/library/re.html#re.search
+            class_instantiation_found = self.is_instantiated_class_found.search(line_of_code)
+
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
         for class_name, class_members in self.class_variables.items():
@@ -191,6 +196,7 @@ class UmlGenerator(object):
         for child_class, parent_class in self.parents.items():
             if not parent_class or parent_class == "object":
                 continue
+
             plantuml_file.write(f"{parent_class} <|-- {child_class}\n")
 
         for related_class, classes in self.class_relationships.items():
