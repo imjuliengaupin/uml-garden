@@ -120,6 +120,9 @@ class UmlGenerator(object):
 
         plantuml_file.write(f"{self.class_name} : {class_method_name}()\n")
 
+    def set_class_instantiation_uml_relationships(self, instantiated_class_name: str) -> None:
+        pass
+
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
 
         # extract the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
@@ -182,6 +185,13 @@ class UmlGenerator(object):
             # if any class instantiation is found
             # NOTE https://docs.python.org/3/library/re.html#re.search
             class_instantiation_found = self.is_instantiated_class_found.search(line_of_code)
+
+            if class_instantiation_found and self.class_name:
+                instantiated_class_name = class_instantiation_found.group(1)
+
+                self.set_class_instantiation_uml_relationships(instantiated_class_name)
+
+                # TEST add a continue statement here ?
 
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
 
