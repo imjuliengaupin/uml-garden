@@ -11,7 +11,7 @@ class UmlGarden(object):
         self.run_uml_garden(argvs)
 
     def run_uml_garden(self, argvs: list[str]) -> None:
-        # if the minimum # of .py file argvs are provided, remove the default script path argument 
+        # if the minimum # of .py file argvs are provided, remove the default script path argument
         # so the program is only considering the .py files in the argvs list passed by the user
         argvs.pop(0) if len(argvs) >= MIN_ARGS_REQUIRED else sys.exit(f"insufficient number of argvs provided")
 
