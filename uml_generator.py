@@ -127,7 +127,7 @@ class UmlGenerator(object):
         plantuml_file.write(f"{self.class_name} : {class_method_name}()\n")
 
     def set_class_instantiation_uml_relationships(self, instantiated_class_name: str) -> None:
-        
+
         if instantiated_class_name not in self.class_relationships[self.class_name]:
             self.class_relationships[self.class_name].append(instantiated_class_name)
 
@@ -175,7 +175,7 @@ class UmlGenerator(object):
 
             if class_variable_found and self.class_name:
                 class_variable_name = class_variable_found.group(1)
-            
+
                 self.set_class_variable_uml_notation(class_variable_name)
 
                 # TEST add a continue statement here ?
