@@ -2,6 +2,7 @@
 import io
 import os
 import re as regex
+import subprocess
 import sys
 
 from constants import PLANTUMLS, UML_OPEN, UML_CLOSE
@@ -31,6 +32,11 @@ class UmlGenerator(object):
 
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         return os.path.basename(self.py_files[index].split('.')[0])
+
+    def generate_plantuml_diagram(self) -> None:
+
+        plantuml_file_path: str = f"{PLANTUMLS}/uml-garden.puml"
+        subprocess.call(["java", "-jar", "plantuml.jar", plantuml_file_path])
 
     def generate_plantuml_class_figure(self) -> None:
 
