@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""uml-garden module for program entry point"""
 
-import os
 import sys
 
-from constants import logging, DEBUG_MODE, LOGGER, LOGS_PATH
 from uml_garden import UmlGarden
 
 
 def main(argvs: list[str]) -> None:
-    "main()"
+    """uml-garden program entry point"""
     UmlGarden(argvs)
 
 
 if __name__ == "__main__":
+    # NOTE brew install java graphviz
+    # NOTE pip3 install pylint autopep8
     main(sys.argv)

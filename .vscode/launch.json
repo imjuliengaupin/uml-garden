@@ -11,7 +11,14 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                // while testing, provide the absolute path to the /poc folder here as a "/string/path"
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/coin.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/dragon.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/enemy_type.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/giant_spider.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/item.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/spear.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/sword.py",
+                "/Users/juliengaupin/Documents/code/projects/uml-garden/poc/weapon_type.py"
             ]
         }
     ]
