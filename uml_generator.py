@@ -2,9 +2,10 @@
 import io
 import os
 import re as regex
+import subprocess
 import sys
 
-from constants import DEBUG_MODE, LOGGER, PLANTUMLS, UML_OPEN, UML_CLOSE
+from constants import PLANTUMLS, UML_OPEN, UML_CLOSE
 
 
 class UmlGenerator(object):
@@ -19,15 +20,25 @@ class UmlGenerator(object):
         self.is_base_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\)\s*:")
         self.is_child_class_found: regex.Pattern = regex.compile(r"^class\s+([\w\d]+)\(\s*([\w\d\._]+)\s*\):")
         self.is_class_variable_found: regex.Pattern = regex.compile(r"^\s+self.([_\w]+)\s*=")
+        self.is_private_class_variable_found: regex.Pattern = regex.compile(r"^__[\w\d_]+")
+        self.is_protected_class_variable_found: regex.Pattern = regex.compile(r"^_[\w\d_]+")
+        self.is_class_method_found: regex.Pattern = regex.compile(r"^\s+def (\w+)\(.*\):")
+        self.is_builtin_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+__")
+        self.is_private_class_method_found: regex.Pattern = regex.compile(r"^__[\w_]+")
+        self.is_protected_class_method_found: regex.Pattern = regex.compile(r"^_[\w_]+")
+        self.is_instantiated_class_found: regex.Pattern = regex.compile(r"((:?[A-Z]+[a-z0-9]+)+)\(.*\)")
 
     def get_package_name(self, index: int) -> str:
-        "get_package_name()"
+
         # return the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         return os.path.basename(self.py_files[index].split('.')[0])
 
-    def generate_plantuml_class_figure(self) -> None:
-        "generate_plantuml_class_figure()"
+    def generate_plantuml_diagram(self) -> None:
 
+        plantuml_file_path: str = f"{PLANTUMLS}/uml-garden.puml"
+        subprocess.call(["java", "-jar", "plantuml.jar", plantuml_file_path])
+
+    def generate_plantuml_class_figure(self) -> None:
         # by default, create a folder in the project directory to store the output .puml file
         if not os.path.exists(PLANTUMLS):
             os.makedirs(PLANTUMLS)
@@ -48,9 +59,6 @@ class UmlGenerator(object):
                 # ... capture the arguments index position in the argvs list
                 index: int = self.py_files.index(py_file)
 
-                if DEBUG_MODE:
-                    LOGGER.debug(f"{self.write_pre_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", index={str(index)})"))
-
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
@@ -69,18 +77,71 @@ class UmlGenerator(object):
             if DEBUG_MODE:
                 LOGGER.debug(f"{self.write_post_uml_relationship_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
 
-            # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
             self.write_post_uml_relationship_content(plantuml_file)
 
             # write out the conventional uml file footer to the new .puml file created
             plantuml_file.write(f"{UML_CLOSE}\n")
 
+    def get_class_variable_uml_notation(self, class_variable_name: str) -> str:
+
+        # for private class variables, e.g. self.__var
+        if self.is_private_class_variable_found.match(class_variable_name):
+            return '-' + class_variable_name
+        # for protected class variables, e.g. self._var
+        elif self.is_protected_class_variable_found.match(class_variable_name):
+            return '#' + class_variable_name
+        # for public class variables, e.g. self.var
+        else:
+            return '+' + class_variable_name
+
+    def get_class_method_uml_notation(self, class_method_name: str) -> str:
+
+        # for built-in class methods, e.g. __init__(), __str__(), etc.
+        if self.is_builtin_class_method_found.match(class_method_name):
+            return '+' + class_method_name
+        # for private class methods, e.g. __method()
+        elif self.is_private_class_method_found.match(class_method_name):
+            return '-' + class_method_name
+        # for protected class methods, e.g. _method()
+        elif self.is_protected_class_method_found.match(class_method_name):
+            return '#' + class_method_name
+        # for public class methods, e.g. method()
+        else:
+            return '+' + class_method_name
+
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
-        "set_class_name_uml_notation()"
-        pass
+        
+        if base_or_child_class_name in self.classes:
+            return
+
+        self.classes.append(base_or_child_class_name)
+
+        self.class_relationships[base_or_child_class_name] = []
+        self.parents[base_or_child_class_name] = parent_class_name
+        self.class_name = base_or_child_class_name  # no type hinting recommended
+        self.class_variables[base_or_child_class_name] = []
+
+        plantuml_file.write(f"class {base_or_child_class_name}\n")
+
+    def set_class_variable_uml_notation(self, class_variable_name: str) -> None:
+
+        class_variable = self.get_class_variable_uml_notation(class_variable_name)
+
+        if class_variable not in self.class_variables[self.class_name]:
+            self.class_variables[self.class_name].append(class_variable)
+
+    def set_class_method_uml_notation(self, plantuml_file: io.TextIOWrapper, class_method_name: str) -> None:
+
+        class_method_name = self.get_class_method_uml_notation(class_method_name)
+
+        plantuml_file.write(f"{self.class_name} : {class_method_name}()\n")
+
+    def set_class_instantiation_uml_relationships(self, instantiated_class_name: str) -> None:
+
+        if instantiated_class_name not in self.class_relationships[self.class_name]:
+            self.class_relationships[self.class_name].append(instantiated_class_name)
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
-        "write_pre_uml_content()"
 
         if DEBUG_MODE:
             LOGGER.debug(f"{self.get_package_name.__doc__}".replace("()", f"(index={str(index)})"))
@@ -135,6 +196,32 @@ class UmlGenerator(object):
             if class_variable_found and self.class_name:
                 class_variable_name = class_variable_found.group(1)
 
+
+                self.set_class_variable_uml_notation(class_variable_name)
+
+                # TEST add a continue statement here ?
+
+            # if a class method is found
+            class_method_found = self.is_class_method_found.match(line_of_code)
+
+            if class_method_found and self.class_name:
+                class_method_name = class_method_found.group(1)
+
+                self.set_class_method_uml_notation(plantuml_file, class_method_name)
+
+                continue
+
+            # if any class instantiation is found
+            # NOTE https://docs.python.org/3/library/re.html#re.search
+            class_instantiation_found = self.is_instantiated_class_found.search(line_of_code)
+
+            if class_instantiation_found and self.class_name:
+                instantiated_class_name = class_instantiation_found.group(1)
+
+                self.set_class_instantiation_uml_relationships(instantiated_class_name)
+
+                # TEST add a continue statement here ?
+               
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
         "write_post_uml_content()"
 
@@ -150,6 +237,7 @@ class UmlGenerator(object):
         for child_class, parent_class in self.parents.items():
             if not parent_class or parent_class == "object":
                 continue
+
             plantuml_file.write(f"{parent_class} <|-- {child_class}\n")
 
         for related_class, classes in self.class_relationships.items():
