@@ -39,7 +39,6 @@ class UmlGenerator(object):
         subprocess.call(["java", "-jar", "plantuml.jar", plantuml_file_path])
 
     def generate_plantuml_class_figure(self) -> None:
-
         # by default, create a folder in the project directory to store the output .puml file
         if not os.path.exists(PLANTUMLS):
             os.makedirs(PLANTUMLS)
@@ -63,9 +62,20 @@ class UmlGenerator(object):
                 # ... write out the .py package name to the new .puml file created
                 self.write_pre_uml_content(plantuml_file, index)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.write_core_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
+
+                # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
                 self.write_core_uml_content(plantuml_file, py_file)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.write_post_uml_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
+
+                # TEST for commenting purposes to determine the representation of self.class_variables in uml diagram
                 self.write_post_uml_content(plantuml_file)
+
+            if DEBUG_MODE:
+                LOGGER.debug(f"{self.write_post_uml_relationship_content.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\")"))
 
             self.write_post_uml_relationship_content(plantuml_file)
 
@@ -100,7 +110,7 @@ class UmlGenerator(object):
             return '+' + class_method_name
 
     def set_class_name_uml_notation(self, plantuml_file: io.TextIOWrapper, base_or_child_class_name: str, parent_class_name: str) -> None:
-
+        
         if base_or_child_class_name in self.classes:
             return
 
@@ -133,6 +143,9 @@ class UmlGenerator(object):
 
     def write_pre_uml_content(self, plantuml_file: io.TextIOWrapper, index: int) -> None:
 
+        if DEBUG_MODE:
+            LOGGER.debug(f"{self.get_package_name.__doc__}".replace("()", f"(index={str(index)})"))
+
         # extract the name of the .py file passed (omitting .py) as an argument to the argvs list to be used as the package name
         package_name: str = self.get_package_name(index)
 
@@ -143,6 +156,7 @@ class UmlGenerator(object):
         plantuml_file.write(f"package {package_name} {{\n")
 
     def write_core_uml_content(self, plantuml_file: io.TextIOWrapper, py_file: str) -> None:
+        "write_core_uml_content()"
 
         for line_of_code in open(py_file, 'r'):
             # if a newline "\n" is found in the code file being read, ignore it
@@ -153,6 +167,9 @@ class UmlGenerator(object):
 
             if base_class_found:
                 base_class_name = base_class_found.group(1)
+
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.set_class_name_uml_notation.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", base_or_child_class_name=\"{base_class_name}\", parent_class_name=\"\")"))
 
                 self.set_class_name_uml_notation(plantuml_file, base_class_name, "")
 
@@ -166,6 +183,9 @@ class UmlGenerator(object):
                 child_class_name = child_class_found.group(1)
                 parent_class_name = child_class_found.group(2)
 
+                if DEBUG_MODE:
+                    LOGGER.debug(f"{self.set_class_name_uml_notation.__doc__}".replace("()", f"(plantuml_file=\"{plantuml_file.name}\", base_or_child_class_name=\"{child_class_name}\", parent_class_name=\"{parent_class_name}\")"))
+
                 self.set_class_name_uml_notation(plantuml_file, child_class_name, parent_class_name)
 
                 continue
@@ -175,6 +195,7 @@ class UmlGenerator(object):
 
             if class_variable_found and self.class_name:
                 class_variable_name = class_variable_found.group(1)
+
 
                 self.set_class_variable_uml_notation(class_variable_name)
 
@@ -200,8 +221,9 @@ class UmlGenerator(object):
                 self.set_class_instantiation_uml_relationships(instantiated_class_name)
 
                 # TEST add a continue statement here ?
-
+               
     def write_post_uml_content(self, plantuml_file: io.TextIOWrapper) -> None:
+        "write_post_uml_content()"
 
         for class_name, class_members in self.class_variables.items():
             for class_member in class_members:
@@ -210,6 +232,7 @@ class UmlGenerator(object):
         plantuml_file.write("}\n\n")
 
     def write_post_uml_relationship_content(self, plantuml_file: io.TextIOWrapper) -> None:
+        "write_post_uml_relationship_content()"
 
         for child_class, parent_class in self.parents.items():
             if not parent_class or parent_class == "object":
